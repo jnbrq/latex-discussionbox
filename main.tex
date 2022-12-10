@@ -1,0 +1,40 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{lipsum}
+\usepackage{discussionbox}
+
+\DefinePerson{Paolo}{magenta}
+\DefinePerson{Mohamed}{blue}
+\DefinePerson{Canberk}{red}
+
+\begin{document}
+\begin{discussion}
+    \Paolo{
+        Hey, what's up?
+        \Canberk{
+            It's perfect! By the way, math formatting works:
+            \begin{align}
+                F = ma
+            \end{align}
+            \Paolo{Wow, that's cool!}
+        }
+        \Mohamed{
+            Same, here! Check out the following Latex logo:
+
+            \begin{center}
+                \includegraphics[width=0.5\linewidth]{fig/latex-logo.png}
+            \end{center}
+            \Paolo{
+                Wow, that's so good!
+            }
+            \Canberk{
+                I totally agree!
+                \Canberk{More and more nesting...}
+            }
+            Previous message continues...
+            \Paolo{Here is a long text:\\ \lipsum[1]}
+        }
+    }
+\end{discussion}
+\end{document}

@@ -1,0 +1,76 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{discussionbox}[DiscussionBox package]
+\RequirePackage{mdframed}
+\RequirePackage{xcolor}
+
+% \fancyhead[L]{\MyAuthor}
+
+% discussion environment
+
+% counter for the discussion
+\newcounter{discussionid}
+
+% counter for the discussion level
+\newcounter{discussionlevel}
+
+% counter for the messages in a discussion
+\newcounter{discussionmsg}
+
+\newenvironment{discussion}[0]{
+    \ifx\indiscussion\undefined
+        \def\indiscussion{}
+        \setcounter{discussionlevel}{0}
+        \setcounter{discussionmsg}{0}
+        \addtocounter{discussionid}{1}
+        \def\msgid{D\arabic{discussionid}}
+        \begin{mdframed}[
+            backgroundcolor=green!10,
+            linewidth=1.5pt,
+            frametitle={Discussion Box \#\arabic{discussionid}},
+            frametitlealignment=\centering,
+            frametitlerule=true,
+            frametitlerulewidth=1.5pt]
+    \else
+        \PackageError{discussion}{}{nesting discussion environments is not allowed}
+    \fi
+}
+{
+    \end{mdframed}
+    \let\indiscussion\undefined
+    \let\msgid\undefined
+}
+
+% typesetting for discussion replies (based on the quotation environment)
+\newenvironment{@discussionreply}
+               {\list{}{}\item\relax}
+               {\endlist}
+
+% usage: \DefinePerson{name}{color}
+\newcommand{\DefinePerson}[2]{
+\expandafter\newcommand\csname #1\endcsname[1]{
+\ifx\indiscussion\undefined % not in a discussion
+    \noindent{\color{#2} {\bf #1} {##1}}
+\else % in a discussion
+    \addtocounter{discussionlevel}{1}
+    \edef\msgid{\msgid }
+    \ifnum\value{discussionlevel}=1
+            \noindent{\color{#2} {\bf #1} [\msgid]: {##1}}
+    \else
+        \begin{@discussionreply}
+            \noindent{\color{#2} {\bf #1} \textit{replies} [\msgid]: {##1}}
+        \end{@discussionreply}
+    \fi
+    \addtocounter{discussionlevel}{-1}
+\fi
+}
+}
+
+% for cross-referenceing messages
+
+\newcommand\To[1]{[$\longrightarrow$ #1]}
+\newcommand{\resultsin}[1][ ]{$\rightarrow$ }
+\newcommand{\placeholder}[1][ ]{{\color{red} {\bf ?}} }
+\newcommand{\citesomething}[1][ ]{{\color{red} {[\bf add citations]}}}
+\newcommand{\refnull}[1]{{\color{red} {[\bf ??]}}}
+\newcommand{\readmefirst}[1]{{\color{blue} #1}}
+\newcommand{\minutes}[1]{\clearpage\section*{#1}} % redefine depending on the organization
