@@ -2,75 +2,81 @@
 \ProvidesPackage{discussionbox}[DiscussionBox package]
 \RequirePackage{mdframed}
 \RequirePackage{xcolor}
-
-% \fancyhead[L]{\MyAuthor}
+\RequirePackage{pgffor}
 
 % discussion environment
+\makeatletter
 
-% counter for the discussion
-\newcounter{discussionid}
+% maximum number of levels supported
+\def\discussionbox@maxlevels{128}
 
-% counter for the discussion level
-\newcounter{discussionlevel}
+% create counters for levels
+\newcounter{discussionbox@lvl0}
+\foreach \x in {1,...,\the\numexpr\discussionbox@maxlevels-1\relax} {
+    \newcounter{discussionbox@lvl\x}[discussionbox@lvl\the\numexpr\x-1\relax]
+}
+\setcounter{discussionbox@lvl0}{0}
 
-% counter for the messages in a discussion
-\newcounter{discussionmsg}
+\newcounter{discussionbox@id} % current discussion box
+\newcounter{discussionbox@level}[discussionbox@id] % current reply level
+\newcounter{discussionbox@msg}[discussionbox@id] % current message number
 
-\newenvironment{discussion}[0]{
-    \ifx\indiscussion\undefined
-        \def\indiscussion{}
-        \setcounter{discussionlevel}{0}
-        \setcounter{discussionmsg}{0}
-        \addtocounter{discussionid}{1}
-        \def\msgid{D\arabic{discussionid}}
+\newenvironment{discussionbox}[0]{
+    \ifx\discussionbox@\undefined
+        \def\discussionbox@{}
+        \addtocounter{discussionbox@id}{1}
         \begin{mdframed}[
             backgroundcolor=green!10,
             linewidth=1.5pt,
-            frametitle={Discussion Box \#\arabic{discussionid}},
+            frametitle={Discussion Box \#\arabic{discussionbox@id}},
             frametitlealignment=\centering,
             frametitlerule=true,
-            frametitlerulewidth=1.5pt]
+            frametitlerulewidth=1.5pt
+        ]
     \else
-        \PackageError{discussion}{}{nesting discussion environments is not allowed}
+        \PackageError{discussionbox}{no nesting allowed}{nesting discussion box environments is not allowed}
     \fi
 }
 {
     \end{mdframed}
-    \let\indiscussion\undefined
-    \let\msgid\undefined
+    \let\discussionbox@\undefined
+}
+
+\newcommand\DiscussionBoxAddr[0]{
+    \ifx\discussionbox@\undefined
+        (none)
+    \else
+        D\arabic{discussionbox@id}%
+        \foreach \lvl in {1,...,\value{discussionbox@level}} {%
+            .\arabic{discussionbox@lvl\lvl}%
+        }
+    \fi
 }
 
 % typesetting for discussion replies (based on the quotation environment)
-\newenvironment{@discussionreply}
+\newenvironment{discussionbox@reply}
                {\list{}{}\item\relax}
                {\endlist}
 
 % usage: \DefinePerson{name}{color}
 \newcommand{\DefinePerson}[2]{
-\expandafter\newcommand\csname #1\endcsname[1]{
-\ifx\indiscussion\undefined % not in a discussion
-    \noindent{\color{#2} {\bf #1} {##1}}
-\else % in a discussion
-    \addtocounter{discussionlevel}{1}
-    \edef\msgid{\msgid }
-    \ifnum\value{discussionlevel}=1
-            \noindent{\color{#2} {\bf #1} [\msgid]: {##1}}
-    \else
-        \begin{@discussionreply}
-            \noindent{\color{#2} {\bf #1} \textit{replies} [\msgid]: {##1}}
-        \end{@discussionreply}
-    \fi
-    \addtocounter{discussionlevel}{-1}
-\fi
-}
+    \expandafter\newcommand\csname #1\endcsname[1]{
+        \ifx\discussionbox@\undefined % not in a discussion
+            \noindent{\color{#2} {\bf #1} {##1}}
+        \else % in a discussion
+            \addtocounter{discussionbox@msg}{1}
+            \addtocounter{discussionbox@level}{1}
+            \stepcounter{discussionbox@lvl\arabic{discussionbox@level}}
+            \ifnum\value{discussionbox@level}=1
+                    \noindent{\color{#2} {\bf #1} [\DiscussionBoxAddr] {##1}}
+            \else
+                \begin{discussionbox@reply}
+                    \noindent{\color{#2} {\bf #1} [\DiscussionBoxAddr] {##1}}
+                \end{discussionbox@reply}
+            \fi
+            \addtocounter{discussionbox@level}{-1}
+        \fi
+    }
 }
 
-% for cross-referenceing messages
-
-\newcommand\To[1]{[$\longrightarrow$ #1]}
-\newcommand{\resultsin}[1][ ]{$\rightarrow$ }
-\newcommand{\placeholder}[1][ ]{{\color{red} {\bf ?}} }
-\newcommand{\citesomething}[1][ ]{{\color{red} {[\bf add citations]}}}
-\newcommand{\refnull}[1]{{\color{red} {[\bf ??]}}}
-\newcommand{\readmefirst}[1]{{\color{blue} #1}}
-\newcommand{\minutes}[1]{\clearpage\section*{#1}} % redefine depending on the organization
+\makeatother
