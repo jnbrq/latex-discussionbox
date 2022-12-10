@@ -3,6 +3,7 @@
 \RequirePackage{mdframed}
 \RequirePackage{xcolor}
 \RequirePackage{pgffor}
+\RequirePackage{hyperref}
 
 % discussion environment
 \makeatletter
@@ -10,21 +11,21 @@
 % maximum number of levels supported
 \def\discussionbox@maxlevels{128}
 
-% create counters for levels
-\newcounter{discussionbox@lvl0}
-\foreach \x in {1,...,\the\numexpr\discussionbox@maxlevels-1\relax} {
-    \newcounter{discussionbox@lvl\x}[discussionbox@lvl\the\numexpr\x-1\relax]
-}
-\setcounter{discussionbox@lvl0}{0}
-
+% internal counters
 \newcounter{discussionbox@id} % current discussion box
 \newcounter{discussionbox@level}[discussionbox@id] % current reply level
 \newcounter{discussionbox@msg}[discussionbox@id] % current message number
 
+% create counters for levels
+\newcounter{discussionbox@lvl0}[discussionbox@id]
+\foreach \x in {1,...,\the\numexpr\discussionbox@maxlevels-1\relax} {
+    \newcounter{discussionbox@lvl\x}[discussionbox@lvl\the\numexpr\x-1\relax]
+}
+
 \newenvironment{discussionbox}[0]{
     \ifx\discussionbox@\undefined
         \def\discussionbox@{}
-        \addtocounter{discussionbox@id}{1}
+        \stepcounter{discussionbox@id}
         \begin{mdframed}[
             backgroundcolor=green!10,
             linewidth=1.5pt,
@@ -42,15 +43,15 @@
     \let\discussionbox@\undefined
 }
 
-\newcommand\DiscussionBoxAddr[0]{
-    \ifx\discussionbox@\undefined
-        (none)
-    \else
+\newcommand\discussionbox@addr[0]{%
+    \ifx\discussionbox@\undefined%
+        (none)%
+    \else%
         D\arabic{discussionbox@id}%
         \foreach \lvl in {1,...,\value{discussionbox@level}} {%
             .\arabic{discussionbox@lvl\lvl}%
-        }
-    \fi
+        }%
+    \fi%
 }
 
 % typesetting for discussion replies (based on the quotation environment)
@@ -64,14 +65,14 @@
         \ifx\discussionbox@\undefined % not in a discussion
             \noindent{\color{#2} {\bf #1} {##1}}
         \else % in a discussion
-            \addtocounter{discussionbox@msg}{1}
-            \addtocounter{discussionbox@level}{1}
+            \stepcounter{discussionbox@msg}
+            \stepcounter{discussionbox@level}
             \stepcounter{discussionbox@lvl\arabic{discussionbox@level}}
             \ifnum\value{discussionbox@level}=1
-                    \noindent{\color{#2} {\bf #1} [\DiscussionBoxAddr] {##1}}
+                    \noindent{\color{#2} {\bf #1} \textsuperscript{[\discussionbox@addr]} {##1}}
             \else
                 \begin{discussionbox@reply}
-                    \noindent{\color{#2} {\bf #1} [\DiscussionBoxAddr] {##1}}
+                    \noindent{\color{#2} {\bf #1} \textsuperscript{[\discussionbox@addr]} {##1}}
                 \end{discussionbox@reply}
             \fi
             \addtocounter{discussionbox@level}{-1}
