@@ -69,15 +69,16 @@
 }
 
 % [customize] default typesetting for the description line of the message
-\newcommand{\dbox@msgdesc}{%
-    \color{\dbox@msgcolor} \dbox@msgtarget {\bf \dbox@msgperson} \textsuperscript{[\dbox@msgaddr]}
+\gdef\dbox@msgdesc{%
+    \color{\dbox@msgcolor} \dbox@msgtarget {\bf \dbox@msgperson} \textsuperscript{[\dbox@msgaddr]}%
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % used for jumping to messages
-\newcommand{\dbox@msgtarget}{\Hy@raisedlink{\hypertarget{tgt@\dbox@msgaddr}{}}}
+\gdef\dbox@msgtarget{\Hy@raisedlink{\hypertarget{tgt@\dbox@msgaddr}{}}}
 
+% no discussion at first
 \global\let\dbox@\undefined
 
 \gdef\dbox@msgperson{%
@@ -180,7 +181,7 @@
 
 % defines a new person
 % usage: \DefinePerson{name}{color}
-\newcommand{\DefinePerson}[2]{
+\gdef\DefinePerson#1#2{
     % save the color of this person
     \expandafter\gdef\csname #1@color\endcsname{#2}
 
