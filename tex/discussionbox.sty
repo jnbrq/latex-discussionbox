@@ -58,7 +58,12 @@
 
 % [customize] default item environment used for typesetting messages
 \newenvironment{dbox@item}{%
-    \list{}{}\item\relax%
+    \ifnum\value{dbox@msglevel}=1%
+        \list{}{\leftmargin=0pt}%
+    \else%
+        \list{}{}%
+    \fi%
+    \item\relax%
 }{%
     \endlist%
 }
@@ -156,21 +161,14 @@
         \foreach \lvl in {1,...,\dbox@msglevel} {
             \xdef\dbox@msgaddr{\dbox@msgaddr.\arabic{dbox@lvl\lvl}}
         }
-
-        \ifnum\value{dbox@msglevel}=1
-        \else
-            \begin{dbox@item}
-        \fi
+        
+        \begin{dbox@item}
         \noindent\dbox@msgdesc
     \fi
 }{
     \ifx\dbox@\undefined
     \else
-        \ifnum\value{dbox@msglevel}=1
-            \vspace*{\itemsep}
-        \else
-            \end{dbox@item}
-        \fi
+        \end{dbox@item}
         \addtocounter{dbox@msglevel}{-1}
     \fi
 }
