@@ -123,6 +123,8 @@
 }
 
 % discussionbox environment
+% usage: \begin{discussion}{title}...\end{discussion}
+% title is optional
 \newenvironment{discussionbox}[1][Discussion Box \#\dbox@nextid]{%
     \ifx\dbox@\undefined%
         \xdef\dbox@{}%
@@ -141,6 +143,7 @@
 }
 
 % message environment
+% usage: \begin{dboxmsg}{person}...\end{dboxmsg}
 \newenvironment{dboxmsg}[1]{
     \stepcounter{dbox@msggid}
     \ifx\dbox@\undefined % not in a discussion
@@ -175,6 +178,7 @@
 
 % typesetting for discussion replies (based on the quotation environment)
 
+% defines a new person
 % usage: \DefinePerson{name}{color}
 \newcommand{\DefinePerson}[2]{
     % save the color of this person
@@ -194,6 +198,8 @@
 %  - https://tex.stackexchange.com/questions/512148/reference-for-newlabel
 %
 
+% mark a message that will be referred later
+% usage: \LabelMsg{label}
 \def\LabelMsg#1{\@bsphack%
     \begingroup%
     \def\label@name{#1}%
