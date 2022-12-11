@@ -1,3 +1,6 @@
+% Canberk Sönmez
+% DiscussionBox package
+
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{discussionbox}[DiscussionBox package]
 \RequirePackage{mdframed}
@@ -7,90 +10,163 @@
 
 \makeatletter
 
-% discussion environment
+% basic accessors, use them for customization
+
+% id of the current discussion box
+\gdef\dbox@id{}
+
+% title of the current discussion box
+\gdef\dbox@title{}
+
+% address of the current message
+\gdef\dbox@msgaddr{}
+
+% id of the current message
+\gdef\dbox@msgid{}
+
+% global id of the current message
+\gdef\dbox@msggid{}
+
+% person who wrote the current message
+\gdef\dbox@msgperson{}
+
+% color of the person who wrote the current message
+\gdef\dbox@msgcolor{}
+
+% depth of the current message
+\gdef\dbox@msglevel{}
+
+% id of the next discussion box (for generating the title)
+\gdef\dbox@nextid{}
+
+% @-free interface for the commands above
+\gdef\dbox#1{\csname dbox@#1\endcsname}
+
+% [customize] default mdframed environment
+\newenvironment{dbox@mdframed}{%
+    \begin{mdframed}[%
+        backgroundcolor=green!4,%
+        linewidth=1.5pt,%
+        frametitle={\dbox@title},%
+        frametitlealignment=\centering,%
+        frametitlerule=true,%
+        frametitlerulewidth=1.5pt%
+    ]%
+}{%
+    \end{mdframed}%
+}
+
+% [customize] default reply environment
+\newenvironment{dbox@reply}{%
+    \list{}{}\item\relax%
+}{%
+    \endlist%
+}
+
+% [customize] default typesetting for the description line of the message
+\newcommand{\dbox@msgdesc}{%
+    \color{\dbox@msgcolor} \hypertarget{tgt@\dbox@msgaddr}{{\bf \dbox@msgperson}} \textsuperscript{[\dbox@msgaddr]}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\global\let\dbox@\undefined
+
+\gdef\dbox@msgperson{%
+    \csname dbox@msgpersonlist\dbox@msglevel\endcsname%
+}
+
+% setter
+\gdef\dbox@msgperson@#1{%
+    \expandafter\xdef\csname dbox@msgpersonlist\dbox@msglevel\endcsname{#1}%
+}
+
+\gdef\dbox@msgcolor{%
+    \csname dbox@msgcolorlist\dbox@msglevel\endcsname%
+}
+
+% setter
+\gdef\dbox@msgcolor@#1{%
+    \expandafter\xdef\csname dbox@msgcolorlist\dbox@msglevel\endcsname{#1}%
+}
+
+\gdef\dbox@nextid{\the\numexpr\value{dbox@id} + 1\relax}
 
 % maximum number of levels supported
-\def\discussionbox@maxlevels{128}
+\gdef\dbox@maxlevels{128}
 
 % internal counters
-\newcounter{discussionbox@id} % current discussion box
-\newcounter{discussionbox@level}[discussionbox@id] % current reply level
-\newcounter{discussionbox@msg}[discussionbox@id] % current message number
-\newcounter{discussionbox@gmsg} % current message number (global)
+\newcounter{dbox@id}
+\gdef\dbox@id{\arabic{dbox@id}}
+
+\newcounter{dbox@msglevel}[dbox@id]
+\gdef\dbox@msglevel{\arabic{dbox@msglevel}}
+
+\newcounter{dbox@msgid}[dbox@id]
+\gdef\dbox@msgid{\arabic{dbox@msgid}}
+
+\newcounter{dbox@msggid}
+\gdef\dbox@msggid{\arabic{dbox@msggid}}
 
 % create counters for levels
-\newcounter{discussionbox@lvl0}[discussionbox@id]
-\foreach \x in {1,...,\the\numexpr\discussionbox@maxlevels-1\relax} {
-    \newcounter{discussionbox@lvl\x}[discussionbox@lvl\the\numexpr\x-1\relax]
+\newcounter{dbox@lvl0}[dbox@id]
+\foreach \x in {1,...,\the\numexpr\dbox@maxlevels-1\relax} {
+    \newcounter{dbox@lvl\x}[dbox@lvl\the\numexpr\x-1\relax]
 }
 
-\newenvironment{discussionbox}[0]{
-    \ifx\discussionbox@\undefined
-        \def\discussionbox@{}
-        \stepcounter{discussionbox@id}
-        \begin{mdframed}[
-            backgroundcolor=green!4,
-            linewidth=1.5pt,
-            frametitle={Discussion Box \#\arabic{discussionbox@id}},
-            frametitlealignment=\centering,
-            frametitlerule=true,
-            frametitlerulewidth=1.5pt
-        ]
-    \else
-        \PackageError{discussionbox}{no nesting allowed}{nesting discussion box environments is not allowed}
-    \fi
-}
-{
-    \end{mdframed}
-    \let\discussionbox@\undefined
-}
-
-\newcommand\discussionbox@@addr[0]{%
-    \ifx\discussionbox@\undefined%
-        (none)%
+\newenvironment{discussionbox}[1][Discussion Box \#\dbox@nextid]{%
+    \ifx\dbox@\undefined%
+        \xdef\dbox@{}%
+        \xdef\dbox@title{#1}%
+        \stepcounter{dbox@id}%
+        \begin{dbox@mdframed}%
     \else%
-        D\arabic{discussionbox@id}%
-        \foreach \lvl in {1,...,\value{discussionbox@level}} {%
-            .\arabic{discussionbox@lvl\lvl}%
-        }%
+        \PackageError{discussionbox}{%
+            no nesting allowed}{%
+            nesting discussion box environments is not allowed}%
     \fi%
+}{%
+        \end{dbox@mdframed}%
+        \global\let\dbox@\undefined%
+        \xdef\dbox@title{}%
 }
 
 % typesetting for discussion replies (based on the quotation environment)
-\newenvironment{discussionbox@reply}
-               {\list{}{}\item\relax}
-               {\endlist}
 
 % usage: \DefinePerson{name}{color}
 \newcommand{\DefinePerson}[2]{
     \expandafter\newcommand\csname #1\endcsname[1]{
-        \stepcounter{discussionbox@gmsg}
-        \ifx\discussionbox@\undefined % not in a discussion
-            \def\discussionbox@addr{(none)}
+        \stepcounter{dbox@msggid}
+        \ifx\dbox@\undefined % not in a discussion
+            \def\dbox@msgaddr{(none)}
             \noindent{\color{#2} {\bf #1} {##1}}
         \else % in a discussion
-            \stepcounter{discussionbox@msg}
-            \stepcounter{discussionbox@level}
-            \stepcounter{discussionbox@lvl\arabic{discussionbox@level}}
+            \stepcounter{dbox@msgid}
+            \stepcounter{dbox@msglevel}
+            \stepcounter{dbox@lvl\dbox@msglevel}
+
+            \dbox@msgperson@{#1}
+            \dbox@msgcolor@{#2}
 
             % since DefinePerson is called in the preamble, we should use xdef
             % xdef stands for global expanding definition
-            \xdef\discussionbox@addr{D\arabic{discussionbox@id}}
-            \foreach \lvl in {1,...,\value{discussionbox@level}} {
-                \xdef\discussionbox@addr{\discussionbox@addr.\arabic{discussionbox@lvl\lvl}}
+            % we must use \foreach independently because it is not expandable.
+            % pass/update the global variable
+            \xdef\dbox@msgaddr{D\dbox@id}
+            \foreach \lvl in {1,...,\dbox@msglevel} {
+                \xdef\dbox@msgaddr{\dbox@msgaddr.\arabic{dbox@lvl\lvl}}
             }
 
-            \ifnum\value{discussionbox@level}=1
+            \ifnum\value{dbox@msglevel}=1
             \else
-            \begin{discussionbox@reply}
+            \begin{dbox@reply}
             \fi
-                % TODO figure out why hypertarget does not work with commands whose names contain at signs [\discussionbox@addr]
-                \noindent{\color{#2} {\bf #1} \textsuperscript{\hypertarget{tgt@\discussionbox@addr}{[\discussionbox@addr]}} {##1}}
-            \ifnum\value{discussionbox@level}=1
+                \noindent{\dbox@msgdesc {##1}}
+            \ifnum\value{dbox@msglevel}=1
             \else
-            \end{discussionbox@reply}
+            \end{dbox@reply}
             \fi
-            \addtocounter{discussionbox@level}{-1}
+            \addtocounter{dbox@msglevel}{-1}
         \fi
     }
 }
@@ -107,10 +183,10 @@
     \label@hook%
     \protected@write\@auxout{}{%
         \string\newlabel{#1}{%
-            {\discussionbox@addr}%
+            {\dbox@msgaddr}%
             {\thepage}%
             {\@currentlabelname}%
-            {tgt@\discussionbox@addr}{}%
+            {tgt@\dbox@msgaddr}{}%
         }%
     }%
     \endgroup%
