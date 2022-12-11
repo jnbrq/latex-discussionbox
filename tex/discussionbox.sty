@@ -2,11 +2,12 @@
 \ProvidesPackage{discussionbox}[DiscussionBox package]
 \RequirePackage{mdframed}
 \RequirePackage{xcolor}
-\RequirePackage{pgffor}
 \RequirePackage{hyperref}
+\RequirePackage{pgffor}
+
+\makeatletter
 
 % discussion environment
-\makeatletter
 
 % maximum number of levels supported
 \def\discussionbox@maxlevels{128}
@@ -15,6 +16,7 @@
 \newcounter{discussionbox@id} % current discussion box
 \newcounter{discussionbox@level}[discussionbox@id] % current reply level
 \newcounter{discussionbox@msg}[discussionbox@id] % current message number
+\newcounter{discussionbox@gmsg} % current message number (global)
 
 % create counters for levels
 \newcounter{discussionbox@lvl0}[discussionbox@id]
@@ -27,7 +29,7 @@
         \def\discussionbox@{}
         \stepcounter{discussionbox@id}
         \begin{mdframed}[
-            backgroundcolor=green!10,
+            backgroundcolor=green!4,
             linewidth=1.5pt,
             frametitle={Discussion Box \#\arabic{discussionbox@id}},
             frametitlealignment=\centering,
@@ -43,7 +45,7 @@
     \let\discussionbox@\undefined
 }
 
-\newcommand\discussionbox@addr[0]{%
+\newcommand\discussionbox@@addr[0]{%
     \ifx\discussionbox@\undefined%
         (none)%
     \else%
@@ -62,22 +64,56 @@
 % usage: \DefinePerson{name}{color}
 \newcommand{\DefinePerson}[2]{
     \expandafter\newcommand\csname #1\endcsname[1]{
+        \stepcounter{discussionbox@gmsg}
         \ifx\discussionbox@\undefined % not in a discussion
+            \def\discussionbox@addr{(none)}
             \noindent{\color{#2} {\bf #1} {##1}}
         \else % in a discussion
             \stepcounter{discussionbox@msg}
             \stepcounter{discussionbox@level}
             \stepcounter{discussionbox@lvl\arabic{discussionbox@level}}
+
+            % since DefinePerson is called in the preamble, we should use xdef
+            % xdef stands for global expanding definition
+            \xdef\discussionbox@addr{D\arabic{discussionbox@id}}
+            \foreach \lvl in {1,...,\value{discussionbox@level}} {
+                \xdef\discussionbox@addr{\discussionbox@addr.\arabic{discussionbox@lvl\lvl}}
+            }
+
             \ifnum\value{discussionbox@level}=1
-                    \noindent{\color{#2} {\bf #1} \textsuperscript{[\discussionbox@addr]} {##1}}
             \else
-                \begin{discussionbox@reply}
-                    \noindent{\color{#2} {\bf #1} \textsuperscript{[\discussionbox@addr]} {##1}}
-                \end{discussionbox@reply}
+            \begin{discussionbox@reply}
+            \fi
+                % TODO figure out why hypertarget does not work with commands whose names contain at signs [\discussionbox@addr]
+                \noindent{\color{#2} {\bf #1} \textsuperscript{\hypertarget{tgt@\discussionbox@addr}{[\discussionbox@addr]}} {##1}}
+            \ifnum\value{discussionbox@level}=1
+            \else
+            \end{discussionbox@reply}
             \fi
             \addtocounter{discussionbox@level}{-1}
         \fi
     }
 }
+
+% check out the following links
+%  - https://tex.stackexchange.com/questions/111280/understanding-how-references-and-labels-work
+%  - https://tex.stackexchange.com/questions/18191/defining-custom-labels
+%  - https://tex.stackexchange.com/questions/512148/reference-for-newlabel
+%
+
+\def\LabelMsg#1{\@bsphack%
+    \begingroup%
+    \def\label@name{#1}%
+    \label@hook%
+    \protected@write\@auxout{}{%
+        \string\newlabel{#1}{%
+            {\discussionbox@addr}%
+            {\thepage}%
+            {\@currentlabelname}%
+            {tgt@\discussionbox@addr}{}%
+        }%
+    }%
+    \endgroup%
+\@esphack}
 
 \makeatother

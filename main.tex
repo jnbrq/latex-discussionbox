@@ -3,6 +3,7 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{lipsum}
+\usepackage{hyperref}
 \usepackage{discussionbox}
 \renewcommand{\familydefault}{\sfdefault}
 
@@ -32,7 +33,7 @@
             }
             \Canberk{
                 I totally agree!
-                \Canberk{More and more nesting...}
+                \Canberk{\LabelMsg{msg:canberk} More and more nesting...}
             }
             Previous message continues...
             \Paolo{Here is a long text:\\ \lipsum[1-2]}
@@ -55,6 +56,7 @@
         \Canberk{
             \lipsum[2][2]
             \Mohamed{
+                Here is the reference \ref{msg:canberk}.
                 \lipsum[2][3]
             }
         }
