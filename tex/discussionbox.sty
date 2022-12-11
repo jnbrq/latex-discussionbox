@@ -65,10 +65,13 @@
 
 % [customize] default typesetting for the description line of the message
 \newcommand{\dbox@msgdesc}{%
-    \color{\dbox@msgcolor} \hypertarget{tgt@\dbox@msgaddr}{{\bf \dbox@msgperson}} \textsuperscript{[\dbox@msgaddr]}%
+    \color{\dbox@msgcolor} \dbox@msgtarget {\bf \dbox@msgperson} \textsuperscript{[\dbox@msgaddr]}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% used for jumping to messages
+\newcommand{\dbox@msgtarget}{\Hy@raisedlink{\hypertarget{tgt@\dbox@msgaddr}{}}}
 
 \global\let\dbox@\undefined
 
