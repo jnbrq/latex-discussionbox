@@ -56,8 +56,8 @@
     \end{mdframed}%
 }
 
-% [customize] default reply environment
-\newenvironment{dbox@reply}{%
+% [customize] default item environment used for typesetting messages
+\newenvironment{dbox@item}{%
     \list{}{}\item\relax%
 }{%
     \endlist%
@@ -117,6 +117,7 @@
     \newcounter{dbox@lvl\x}[dbox@lvl\the\numexpr\x-1\relax]
 }
 
+% discussionbox environment
 \newenvironment{discussionbox}[1][Discussion Box \#\dbox@nextid]{%
     \ifx\dbox@\undefined%
         \xdef\dbox@{}%
@@ -134,43 +135,57 @@
         \xdef\dbox@title{}%
 }
 
+% message environment
+\newenvironment{dboxmsg}[1]{
+    \stepcounter{dbox@msggid}
+    \ifx\dbox@\undefined % not in a discussion
+        \def\dbox@msgaddr{(none)}
+        \dbox@msgdesc
+    \else % in a discussion
+        \stepcounter{dbox@msgid}
+        \stepcounter{dbox@msglevel}
+        \stepcounter{dbox@lvl\dbox@msglevel}
+
+        \dbox@msgperson@{#1}
+        \dbox@msgcolor@{\csname #1@color\endcsname}
+
+        % xdef stands for global expanding definition
+        % we must use \foreach independently because it is not expandable.
+        % pass/update the global variable
+        \xdef\dbox@msgaddr{D\dbox@id}
+        \foreach \lvl in {1,...,\dbox@msglevel} {
+            \xdef\dbox@msgaddr{\dbox@msgaddr.\arabic{dbox@lvl\lvl}}
+        }
+
+        \ifnum\value{dbox@msglevel}=1
+        \else
+            \begin{dbox@item}
+        \fi
+        \noindent\dbox@msgdesc
+    \fi
+}{
+    \ifx\dbox@\undefined
+    \else
+        \ifnum\value{dbox@msglevel}=1
+        \else
+            \end{dbox@item}
+        \fi
+        \addtocounter{dbox@msglevel}{-1}
+    \fi
+}
+
 % typesetting for discussion replies (based on the quotation environment)
 
 % usage: \DefinePerson{name}{color}
 \newcommand{\DefinePerson}[2]{
+    % save the color of this person
+    \expandafter\gdef\csname #1@color\endcsname{#2}
+
+    % special command for the person
     \expandafter\newcommand\csname #1\endcsname[1]{
-        \stepcounter{dbox@msggid}
-        \ifx\dbox@\undefined % not in a discussion
-            \def\dbox@msgaddr{(none)}
-            \noindent{\color{#2} {\bf #1} {##1}}
-        \else % in a discussion
-            \stepcounter{dbox@msgid}
-            \stepcounter{dbox@msglevel}
-            \stepcounter{dbox@lvl\dbox@msglevel}
-
-            \dbox@msgperson@{#1}
-            \dbox@msgcolor@{#2}
-
-            % since DefinePerson is called in the preamble, we should use xdef
-            % xdef stands for global expanding definition
-            % we must use \foreach independently because it is not expandable.
-            % pass/update the global variable
-            \xdef\dbox@msgaddr{D\dbox@id}
-            \foreach \lvl in {1,...,\dbox@msglevel} {
-                \xdef\dbox@msgaddr{\dbox@msgaddr.\arabic{dbox@lvl\lvl}}
-            }
-
-            \ifnum\value{dbox@msglevel}=1
-            \else
-            \begin{dbox@reply}
-            \fi
-                \noindent{\dbox@msgdesc {##1}}
-            \ifnum\value{dbox@msglevel}=1
-            \else
-            \end{dbox@reply}
-            \fi
-            \addtocounter{dbox@msglevel}{-1}
-        \fi
+        \begin{dboxmsg}{#1}
+            ##1
+        \end{dboxmsg}
     }
 }
 
