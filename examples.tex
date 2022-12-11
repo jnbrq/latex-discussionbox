@@ -1,0 +1,54 @@
+\DefinePerson{Canberk}{magenta}
+\DefinePerson{Ahmet}{blue}
+\DefinePerson{Mehmet}{red}
+
+\begin{discussionbox}
+    \Canberk{
+        Hey, what's up?
+        \Ahmet{
+            It's perfect! By the way, math formatting works:
+            \begin{align}
+                F = ma
+            \end{align}
+            \Ahmet{Wow, that's cool!}
+        }
+        \Mehmet{
+            Same here! Check out the following Latex logo:
+
+            \begin{center}
+                \includegraphics[width=0.3\linewidth]{fig/latex-logo.png}
+            \end{center}
+            \Ahmet{
+                Wow, that's so good!
+            }
+            \Canberk{
+                I totally agree!
+                \Canberk{\LabelMsg{msg:canberk} More and more nesting...}
+            }
+            Previous message continues...
+            \Ahmet{Here is a long text:\\ \lipsum[1-2]}
+        }
+    }
+\end{discussionbox}
+
+\begin{discussionbox}
+    \Ahmet{
+        \lipsum[1]
+        \Canberk{
+            \lipsum[2-3]
+            \Mehmet{
+                \lipsum[4-5][3]
+            }
+        }
+    }
+    \Ahmet{
+        \lipsum[6-7]
+        \Canberk{
+            \lipsum[8-9]
+            \Mehmet{
+                Here is the reference \ref{msg:canberk}.
+                \lipsum[10-11]
+            }
+        }
+    }
+\end{discussionbox}

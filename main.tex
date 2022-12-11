@@ -9,73 +9,106 @@
 \usepackage{discussionbox}
 \renewcommand{\familydefault}{\sfdefault}
 
-\DefinePerson{Canberk}{blue}
-\DefinePerson{PersonA}{magenta}
-\DefinePerson{PersonB}{blue}
+\DefinePerson{Intro}{black}
+\DefinePerson{Basics}{black}
+\DefinePerson{Communication}{black}
 
 \begin{document}
 
 \begin{discussionbox}[Tutorial (D\dbox{nextid})]
-    \Canberk{Welcome to the DiscussionBox tutorial!}
-    \Canberk{
+    \Intro{
         DiscussionBox provides a forum-like typesetting for discussions taking place on \LaTeX{} document sharing platforms like Overleaf.
-        Compared to review mechanisms provided by such platforms, DiscussionBox enables non-volatile and structured conversations, similar what e-mail.
+        Compared to review mechanisms provided by such platforms, DiscussionBox enables non-volatile and structured conversations, somewhat to e-mail.
         Unlike e-mail, however, you can benefit from powerful \LaTeX{} features!
     }
-    \Canberk{
-        DiscussionBox has two components: messages and a box to contain them.
-    }
-\end{discussionbox}
 
-\begin{discussionbox}
-    \Canberk{
-        Hey, what's up?
-        \PersonA{
-            It's perfect! By the way, math formatting works:
-            \begin{align}
-                F = ma
-            \end{align}
-            \PersonA{Wow, that's cool!}
-        }
-        \PersonB{
-            Same here! Check out the following Latex logo:
+    \begin{dboxmsg}{Basics}
+        The fundamental component of the DiscussionBox package is, well, a \texttt{discussionbox}:
+        \begin{verbatim}
+    % discussion boxes are declared as an environment:
+    \begin{discussionbox}[Discussion \dbox{nextid}] % title is optional
+        % you can use \dbox{nextid} to enumerate titles
+        % the default title is "Discussion Box #1"
 
-            \begin{center}
-                \includegraphics[width=0.5\linewidth]{fig/latex-logo.png}
-            \end{center}
-            \PersonA{
-                Wow, that's so good!
-            }
-            \Canberk{
-                I totally agree!
-                \Canberk{\LabelMsg{msg:canberk} More and more nesting...}
-            }
-            Previous message continues...
-            \PersonA{Here is a long text:\\ \lipsum[1-2]}
-        }
-    }
-\end{discussionbox}
+        % messages...
+    \end{discussionbox}
+        \end{verbatim}
+    \end{dboxmsg}
 
-\begin{discussionbox}
-    \PersonA{
-        \lipsum[1][1]
+    \begin{dboxmsg}{Basics}
+        A discussion box is merely a container for \textit{message}s and a message is typed by a \textit{person}.
+
+        \begin{verbatim}
+    % in the preamble, define a person:
+    \DefinePerson{Canberk}{blue} % \DefinePerson{name}{color}
+    
+    % within document:
+
+    \begin{discussionbox}
+
+        % messages using a single-name command:
         \Canberk{
-            \lipsum[1][2]
-            \PersonB{
-                \lipsum[1][3]
-            }
+            Your message here...
         }
+
+        % or, in an environment: (which might work better in some cases)
+        \begin{dboxmsg}{Canberk} % \begin{dboxmsg}{person name}...\end{dboxmsg}
+            Your message here...
+        \end{dboxmsg}
+
+    \end{discussionbox}
+        \end{verbatim}
+    
+    \noindent The name of the author is shown in the beginning of the message.
+    Furthermore, the entire message colored with the color of the author.\\
+    Within a message, you are allowed to use all the \LaTeX{} features, you can look for the examples below.
+    \end{dboxmsg}
+
+    \Communication{\LabelMsg{msg:msg1}
+        The main idea of a DiscussionBox is to enable effective communication over.
+        For that purpose, it provides three important features: (1) \textit{message addresses}, (2) \textit{references} and (3) \textit{replies}.
     }
-    \PersonA{
-        \lipsum[2][1]
-        \Canberk{
-            \lipsum[2][2]
-            \PersonB{
-                Here is the reference \ref{msg:canberk}.
-                \lipsum[2][3]
-            }
-        }
+    \begin{dboxmsg}{Communication}
+        Each message in a discussion box is uniquely identified by an address.
+        For example, the address of this one \dbox{msgaddr}.
+        D$x$ stands for the discussion with number $x$ and the rest of the address identifies the message within a discussion.
+        Addresses appear right next to the author name and formatted as superscript.
+        You can use these addresses to refer to messages.
+        Similar to other \LaTeX{} objects that can be referenced, you need to first label the message:
+
+        \begin{verbatim}
+    % use \LabelMsg{label} to label a message
+    \Canberk{Hello, I say things .... \LabelMsg{canberk:things}}
+
+    % later...
+
+    \Mehmet{Note what Canberk says \ref{canberk:things}, he says some serious stuff.}
+        \end{verbatim}
+        
+        \noindent Let's reference the previous message: \ref{msg:msg1}!
+        You can click on the reference to navigate to the message.
+        \LabelMsg{msg:msg2}
+
+        \begin{dboxmsg}{Communication}
+            A message can be a reply to another message.
+            For example, this message (\dbox{msgaddr}) replies to \ref{msg:msg2}.
+            Message addresses reflect reply-to relations.
+            If a message has address D$x$.$y$.$z$.$n$, it is the $n$\textsuperscript{th} reply to D$x$.$y$.$z$.
+        \end{dboxmsg}
+        \begin{dboxmsg}{Communication}
+            For instance, the last character of the address of this message is 2.
+            A reply message is nested within the message that it replies to:
+            \begin{verbatim}
+    \Mehmet{I think Switzerland is the most prominent economy in Europe.
+            \Canberk{I disagree, it is Germany.}
     }
+
+    % works the same way with environments
+            \end{verbatim}
+        \end{dboxmsg}
+    \end{dboxmsg}
 \end{discussionbox}
+
+\input{examples.tex}
 
 \end{document}
