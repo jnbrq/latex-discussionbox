@@ -57,6 +57,7 @@
 }
 
 % [customize] default item environment used for typesetting messages
+% heavily inspired by the quotation environment
 \newenvironment{dbox@item}{%
     \ifnum\value{dbox@msglevel}=1%
         \list{}{\leftmargin=0pt}%
@@ -106,16 +107,16 @@
 
 % internal counters
 \newcounter{dbox@id}
-\gdef\dbox@id{\arabic{dbox@id}}
+\gdef\dbox@id{\the\value{dbox@id}}
 
 \newcounter{dbox@msglevel}[dbox@id]
-\gdef\dbox@msglevel{\arabic{dbox@msglevel}}
+\gdef\dbox@msglevel{\the\value{dbox@msglevel}}
 
 \newcounter{dbox@msgid}[dbox@id]
-\gdef\dbox@msgid{\arabic{dbox@msgid}}
+\gdef\dbox@msgid{\the\value{dbox@msgid}}
 
 \newcounter{dbox@msggid}
-\gdef\dbox@msggid{\arabic{dbox@msggid}}
+\gdef\dbox@msggid{\the\value{dbox@msggid}}
 
 % create counters for levels
 \newcounter{dbox@lvl0}[dbox@id]
@@ -163,7 +164,7 @@
         % pass/update the global variable
         \xdef\dbox@msgaddr{D\dbox@id}
         \foreach \lvl in {1,...,\dbox@msglevel} {
-            \xdef\dbox@msgaddr{\dbox@msgaddr.\arabic{dbox@lvl\lvl}}
+            \xdef\dbox@msgaddr{\dbox@msgaddr.\the\value{dbox@lvl\lvl}}
         }
         
         \begin{dbox@item}
@@ -177,8 +178,6 @@
     \fi
 }
 
-% typesetting for discussion replies (based on the quotation environment)
-
 % defines a new person
 % usage: \DefinePerson{name}{color}
 \gdef\DefinePerson#1#2{
@@ -191,6 +190,18 @@
             ##1
         \end{dboxmsg}
     }
+
+    % mail counter
+    \newcounter{#1@mailcount}
+
+    % mail counter to be updated by aux
+    \newcounter{#1@mailcount@}
+
+    \AtEndDocument{%
+        \protected@write\@auxout{}{%
+            \string\setcounter{#1@mailcount@}{\the\value{#1@mailcount}}%
+        }%
+    }
 }
 
 % check out the following links
@@ -201,7 +212,7 @@
 
 % mark a message that will be referred later
 % usage: \LabelMsg{label}
-\def\LabelMsg#1{\@bsphack%
+\gdef\LabelMsg#1{\@bsphack%
     \begingroup%
     \def\label@name{#1}%
     \label@hook%
@@ -215,5 +226,27 @@
     }%
     \endgroup%
 \@esphack}
+
+% mark a message for a person to see
+% usage: \SeeMsg{person}
+\gdef\SeeMsg#1{\@bsphack%
+    \stepcounter{#1@mailcount}%
+    \LabelMsg{#1@mail\the\value{#1@mailcount}}%
+\@esphack}
+
+% lists messages marked for a person to see
+% usage: \ListSeeMsgs{person}
+\gdef\ListSeeMsgs#1{%
+    \begingroup%
+    \def\mailcount{\value{#1@mailcount@}}%
+    \ifnum\mailcount=0%
+        % nothing, probably the first run
+    \else%
+        \foreach \i in {1,...,\mailcount} {
+            \ref{#1@mail\i}
+        }
+    \fi%
+    \endgroup%
+}
 
 \makeatother
