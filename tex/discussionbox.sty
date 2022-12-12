@@ -229,11 +229,11 @@
 
 % mark a message for a person to see
 % usage: \SeeMsg{person}
-\gdef\SeeMsg#1{\@bsphack%
+\gdef\SeeMsg#1{%
     \stepcounter{#1@mailcount}%
     \LabelMsg{#1@mail\the\value{#1@mailcount}}%
-    {\color{\csname #1@color\endcsname}@#1}
-\@esphack}
+    {\color{\csname #1@color\endcsname}@#1}%
+}
 
 % lists messages marked for a person to see
 % usage: \ListSeeMsgs{person}
