@@ -59,6 +59,7 @@
 % [customize] default item environment used for typesetting messages
 % heavily inspired by the quotation environment
 \newenvironment{dbox@item}{%
+    \vspace{0.5\baselineskip}%
     \ifnum\value{dbox@msglevel}=1%
         \list{}{%
             \leftmargin=0pt%
@@ -72,7 +73,6 @@
     \item\relax%
 }{%
     \endlist%
-    \vspace{0.5\baselineskip}%
 }
 
 % [customize] default typesetting for the description line of the message
