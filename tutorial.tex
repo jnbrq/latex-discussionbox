@@ -33,6 +33,8 @@
         % messages...
     \end{discussionbox}
         \end{verbatim}
+
+        Please check \texttt{discussionbox.sty} file to learn about the customization opportunities.
     \end{dboxmsg}
 
     \begin{dboxmsg}{Basics}
@@ -64,14 +66,15 @@
 
     \Communication{\LabelMsg{msg:msg1}
         The main idea of a DiscussionBox is to enable effective communication over.
-        For that purpose, it provides three important features: (1) \textit{message addresses}, (2) \textit{references} and (3) \textit{replies}.
+        For that purpose, it provides four important features:
+        (1) \textit{message addresses}, (2) \textit{references}, (3) \textit{replies} and (4) \textit{see-messages}.
     }
     \begin{dboxmsg}{Communication}
         Each message in a discussion box is uniquely identified by an address.
         For example, the address of this one \dbox{msgaddr}.
         D$x$ stands for the discussion with number $x$ and the rest of the address identifies the message within a discussion.
         Addresses appear right next to the author name and formatted as superscript.
-        You can use these addresses to refer to messages.
+        You can use the address of a message to refer to it.
         Similar to other \LaTeX{} objects that can be referenced, you need to first label the message:
 
         \begin{verbatim}
@@ -85,6 +88,7 @@
         
         \noindent Let's reference the previous message: \ref{msg:msg1}!
         You can click on the reference to navigate to the message.
+        \textbf{Note that, on Overleaf, you must use ``Browser'' instead of ``Overleaf'' as the PDF viewer for hyperlinks to work.}
         \LabelMsg{msg:msg2}
 
         \begin{dboxmsg}{Communication}
@@ -104,6 +108,23 @@
     % works the same way with environments
             \end{verbatim}
         \end{dboxmsg}
+    \end{dboxmsg}
+
+    \begin{dboxmsg}{Communication}
+        Finally, DiscussionBox provides a simple, in-document mailbox mechanism to notify people of new messages, namely see-message:
+
+        \begin{verbatim}
+            % list the unread messages for someone:
+            \ListSeeMsgs{Canberk} % usage: \ListSeeMsgs{person}
+
+            % mark a message unread for someone:
+            % usage: \SeeMsg{person}
+            \Mehmet{
+                Canberk should see this! \SeeMsg{Canberk}
+            }
+        \end{verbatim}
+
+        The person who read the message marked to be seen can unmark it by removing \verb|\SeeMsg{...}|.
     \end{dboxmsg}
 \end{discussionbox}
 
