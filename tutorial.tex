@@ -1,12 +1,10 @@
 % Canberk Sönmez
 
 \documentclass{article}
+
 \usepackage[margin=2cm]{geometry}
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{lipsum}
-\usepackage{hyperref}
 \usepackage{discussionbox}
+
 \renewcommand{\familydefault}{\sfdefault}
 
 \DefinePerson{Intro}{black}
@@ -17,12 +15,14 @@
 
 \begin{discussionbox}[Tutorial (D\dbox{nextid})]
     \Intro{
+        \SeeMsg{Basics}
         DiscussionBox provides a forum-like typesetting for discussions taking place on \LaTeX{} document sharing platforms like Overleaf.
         Compared to review mechanisms provided by such platforms, DiscussionBox enables non-volatile and structured conversations, somewhat similar to e-mail.
         Unlike e-mail, however, you can benefit from all of the powerful \LaTeX{} features!
     }
 
     \begin{dboxmsg}{Basics}
+        % \SeeMsg{Basics}
         The fundamental component of the DiscussionBox package is, well, a \texttt{discussionbox}:
         \begin{verbatim}
     % discussion boxes are declared as an environment:
@@ -42,16 +42,16 @@
     % in the preamble, define a person:
     \DefinePerson{Canberk}{blue} % \DefinePerson{name}{color}
     
-    % within document:
+    % within the document:
 
     \begin{discussionbox}
 
-        % messages using a single-name command:
+        % messages using a simple command:
         \Canberk{
             Your message here...
         }
 
-        % or, in an environment: (which might work better in some cases)
+        % or, defined as an environment: (which might work better in some cases)
         \begin{dboxmsg}{Canberk} % \begin{dboxmsg}{person name}...\end{dboxmsg}
             Your message here...
         \end{dboxmsg}
@@ -59,9 +59,7 @@
     \end{discussionbox}
         \end{verbatim}
     
-    \noindent The name of the author is shown in the beginning of the message.
-    Furthermore, the entire message colored with the color of the author.\\
-    Within a message, you are allowed to use all the \LaTeX{} features, you can look for the examples below.
+    \noindent The name of the author is shown in the beginning of the message, and the entire message colored with the color of the author.
     \end{dboxmsg}
 
     \Communication{\LabelMsg{msg:msg1}
@@ -108,7 +106,5 @@
         \end{dboxmsg}
     \end{dboxmsg}
 \end{discussionbox}
-
-\input{examples.tex}
 
 \end{document}

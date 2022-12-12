@@ -1,18 +1,40 @@
+% Canberk Sönmez
+
+\documentclass{article}
+
+\usepackage[margin=2cm]{geometry}
+\usepackage{lipsum}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{discussionbox}
+
+\renewcommand{\familydefault}{\sfdefault}
+
 \DefinePerson{Canberk}{magenta}
 \DefinePerson{Ahmet}{blue}
 \DefinePerson{Mehmet}{red}
+
+\begin{document}
+
+Unread messages:
+\begin{itemize}
+    \item \textbf{For Canberk:} \ListSeeMsgs{Canberk}
+    \item \textbf{For Ahmet:} \ListSeeMsgs{Ahmet}
+    \item \textbf{For Mehmet:} \ListSeeMsgs{Mehmet}
+\end{itemize}
 
 \begin{discussionbox}
     \Canberk{
         Hey, what's up?
         \Ahmet{
-            It's perfect! By the way, math formatting works:
+            \SeeMsg{Canberk}\SeeMsg{Mehmet} It's perfect! By the way, math formatting works:
             \begin{align}
                 F = ma
             \end{align}
             \Ahmet{Wow, that's cool!}
         }
         \Mehmet{
+            \SeeMsg{Canberk}
             Same here! Check out the following Latex logo:
 
             \begin{center}
@@ -31,6 +53,7 @@
     }
 \end{discussionbox}
 
+\clearpage
 \begin{discussionbox}
     \Ahmet{
         \lipsum[1]
@@ -44,11 +67,13 @@
     \Ahmet{
         \lipsum[6-7]
         \Canberk{
-            \lipsum[8-9]
+            \lipsum[8-12]
             \Mehmet{
-                Here is the reference \ref{msg:canberk}.
-                \lipsum[10-11]
+                Here is the reference \ref{msg:canberk}. \textbf{Also, Canberk should read this.}\SeeMsg{Canberk}
+                \lipsum[13-19]
             }
         }
     }
 \end{discussionbox}
+
+\end{document}
