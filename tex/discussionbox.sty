@@ -60,7 +60,12 @@
 % heavily inspired by the quotation environment
 \newenvironment{dbox@item}{%
     \ifnum\value{dbox@msglevel}=1%
-        \list{}{\leftmargin=0pt\topsep=0pt}%
+        \list{}{%
+            \leftmargin=0pt%
+            \topsep=0pt%
+            \partopsep=0pt%
+            \parskip=0pt%
+            \itemsep=0pt}%
     \else%
         \list{}{\topsep=0pt}%
     \fi%
