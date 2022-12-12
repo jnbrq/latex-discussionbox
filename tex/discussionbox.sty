@@ -232,6 +232,7 @@
 \gdef\SeeMsg#1{\@bsphack%
     \stepcounter{#1@mailcount}%
     \LabelMsg{#1@mail\the\value{#1@mailcount}}%
+    {\color{\csname #1@color\endcsname}@#1}
 \@esphack}
 
 % lists messages marked for a person to see
