@@ -60,13 +60,14 @@
 % heavily inspired by the quotation environment
 \newenvironment{dbox@item}{%
     \ifnum\value{dbox@msglevel}=1%
-        \list{}{\leftmargin=0pt}%
+        \list{}{\leftmargin=0pt\topsep=0pt}%
     \else%
-        \list{}{}%
+        \list{}{\topsep=0pt}%
     \fi%
     \item\relax%
 }{%
     \endlist%
+    \vspace{0.5\baselineskip}%
 }
 
 % [customize] default typesetting for the description line of the message
