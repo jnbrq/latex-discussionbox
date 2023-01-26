@@ -7,6 +7,7 @@
 \RequirePackage{xcolor}
 \RequirePackage{hyperref}
 \RequirePackage{pgffor}
+\RequirePackage{pdftexcmds}
 
 \makeatletter
 
@@ -78,6 +79,11 @@
 % [customize] default typesetting for the description line of the message
 \gdef\dbox@msgdesc{%
     \color{\dbox@msgcolor} \dbox@msgtarget {\bf \dbox@msgperson} \textsuperscript{[\dbox@msgaddr]}%
+}
+
+% [customize] default typesetting for the description line of the message coming from no author
+\gdef\dbox@msgdescnoauthor{%
+    \color{\dbox@msgcolor} \dbox@msgtarget [\dbox@msgaddr]%
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -174,7 +180,11 @@
         }
         
         \begin{dbox@item}
-        \noindent\dbox@msgdesc
+        \ifnum\pdf@strcmp{\unexpanded{#1}}{NoAuthor}=0
+            \noindent\dbox@msgdescnoauthor
+        \else
+            \noindent\dbox@msgdesc
+        \fi
     \fi
 }{
     \ifx\dbox@\undefined
@@ -209,6 +219,7 @@
         }%
     }
 }
+
 
 % check out the following links
 %  - https://tex.stackexchange.com/questions/111280/understanding-how-references-and-labels-work
